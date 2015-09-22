@@ -104,6 +104,9 @@ class UserInfo(object):
         )
         return user_string
 
+    def to_dict(self):
+        return self.__dict__
+
 
 class Parser(object):
     pass
