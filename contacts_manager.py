@@ -29,7 +29,7 @@ class ContactsManager(object):
 class ContactsTree(object):
     _contacts = []
 
-    def __init__(self):
+    def __init__(self, depth):
         pass
 
 
