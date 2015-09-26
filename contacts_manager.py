@@ -1,10 +1,12 @@
-from random import choice, Random
+from random import choice, Random, randint
 import math
-from simulation import UserInfo
+
+from simulation import UserInfo, User
 
 
 class ContactsManager(object):
-    _names = ['Joe', 'Sam', 'Gabe', 'Jessy', 'Mike']
+    _names = ['Joe', 'Sam', 'Gabe',
+              'Jessy', 'Mike', 'Ola', 'Jack', 'Joe']
     _genders = ['M', 'F']
 
     def __init__(self):
@@ -19,7 +21,7 @@ class ContactsManager(object):
                 math.floor(random.uniform(min_age, max_age)),
                 choice(self._genders)
             )
-            yield user_info
+            yield User(user_info)
 
     def generate_contacts(self, count, age_range=(15, 60)):
         contacts = self._contacts_generator(count, age_range)
@@ -27,11 +29,26 @@ class ContactsManager(object):
 
 
 class ContactsTree(object):
-    _contacts = []
 
     def __init__(self, depth):
-        pass
+        self.depth = depth
+        self.manager = ContactsManager()
+
+    def _generate_tree(self, user, depth):
+        if depth != 0:
+            for contact in user.contacts:
+                self._generate_tree(contact, depth-1)
+        user.contacts = self.manager.generate_contacts(randint(5, 8))
+
+    def generate_tree(self, depth):
+        user = self.manager.generate_contacts(1)[0]
+        self._generate_tree(user, depth-1)
+        return user
 
 
 class ContactsTreeVisualizer(object):
+    pass
+
+
+if __name__ == '__main__':
     pass

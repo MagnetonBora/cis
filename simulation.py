@@ -1,3 +1,4 @@
+import string
 import sys
 import json
 import random
@@ -36,6 +37,11 @@ class Controller(object):
         if reply < self._settings['reply_prob']:
             answer = user.answer(self._question, self._answers)
             if user.parent is not None:
+                print 'User id: {uid} {child} replies to {parent}'.format(
+                    uid=user.uid,
+                    child=user.user_info.name,
+                    parent=user.parent.user_info.name
+                )
                 user.parent.replies.append(answer)
 
         for contact in user.contacts:
@@ -51,10 +57,37 @@ class Controller(object):
 class User(object):
 
     def __init__(self, user_info, contacts=None):
+        self._uid = self._generate_uid(8)
         self._contacts = [] if contacts is None else contacts
         self._user_info = user_info
         self._replies = []
         self._parent = None
+
+    def _generate_uid(self, length):
+        symbols = [random.choice(string.ascii_letters + string.digits) for i in xrange(length)]
+        return string.join(symbols, '')
+
+    def _traverse(self, root, users):
+        users.append(root.to_dict())
+        for contact in root.contacts:
+            self._traverse(contact, users)
+        return users
+
+    def traverse(self):
+        return self._traverse(self, [])
+
+    def to_dict(self):
+        info = self._user_info.to_dict()
+        info.update(dict(uid=self._uid))
+        return info
+
+    @property
+    def user_info(self):
+        return self._user_info
+
+    @property
+    def uid(self):
+        return self._uid
 
     @property
     def replies(self):
@@ -63,6 +96,14 @@ class User(object):
     @property
     def contacts(self):
         return self._contacts
+
+    @contacts.setter
+    def contacts(self, contacts_collection):
+        if len(self._contacts) == 0:
+            self._contacts = contacts_collection
+        else:
+            for contact in contacts_collection:
+                self._contacts.append(contact)
 
     @property
     def parent(self):
@@ -86,7 +127,7 @@ class User(object):
                 self.add_contact(contact)
 
     def __repr__(self):
-        return self._user_info.name
+        return self._uid
 
 
 class UserInfo(object):

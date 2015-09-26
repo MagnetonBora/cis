@@ -32,12 +32,10 @@ import string
 
 TOKEN_LENGTH = 8
 
+
 def generate_token(length):
-	symbols = [
-		random.choice(string.ascii_letters + string.digits)
-		for i in xrange(length)
-	]
-	return string.join(symbols, '')
+    symbols = [random.choice(string.ascii_letters + string.digits) for i in xrange(length)]
+    return string.join(symbols, '')
 
 if __name__ == '__main__':
 	for i in xrange(10):
