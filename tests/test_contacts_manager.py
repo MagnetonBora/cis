@@ -1,11 +1,17 @@
 from unittest import TestCase
-from contacts_manager import ContactsManager
+from mock import patch
+from utils import ContactsManager
 
 
 class ContactsManagerTest(TestCase):
 
     def setUp(self):
+        self.read_names = patch('utils.read_names').start()
+        self.read_names.return_value = ['Sam', 'Joe', 'Sue']
         self.manager = ContactsManager()
+
+    def tearDown(self):
+        self.read_names.stop()
 
     def test_generates_random_contacts_set(self):
         contacts = self.manager.generate_contacts(5)

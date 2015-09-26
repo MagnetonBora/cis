@@ -3,6 +3,12 @@ import math
 import string
 
 
+def read_names(file_path):
+    with open(file_path, 'r') as input_file:
+        names = input_file.readlines()
+    return names
+
+
 class User(object):
 
     def __init__(self, user_info, contacts=None):
@@ -99,12 +105,11 @@ class UserInfo(object):
 
 
 class ContactsManager(object):
-    _names = ['Joe', 'Sam', 'Gabe',
-              'Jessy', 'Mike', 'Ola', 'Jack']
+    _names = []
     _genders = ['M', 'F']
 
     def __init__(self):
-        pass
+        self._names = read_names('data/names.dat')
 
     def _contacts_generator(self, count, age_range):
         random = Random()

@@ -4,7 +4,7 @@ import random
 from random import uniform
 import math
 
-from contacts_manager import ContactsTree
+from utils import ContactsTree
 
 
 class SimulationManager(object):
@@ -29,13 +29,13 @@ class SimulationManager(object):
             k: math.floor(100*v/total_answers)
             for k, v in stats.iteritems()
         }
-        return tuple(stats.items() + stats_relative.items())
+        return stats_relative
 
     def start_simulation(self):
         self._invoke(self._sender, 1)
 
     def _invoke(self, user, depth):
-        self._current_time += random.gauss(6, 1)
+        self._current_time += random.gauss(1, 0.1)
 
         print 'Current time: {current_time}'.format(
             current_time=self._current_time
@@ -51,7 +51,7 @@ class SimulationManager(object):
         if reply < self._settings['reply_prob']:
             answer = user.answer(self._answers)
             if user.parent is not None:
-                print 'User id: {uid} {child} replies to {parent} answer {answer}'.format(
+                print 'User {child} id={uid} replies to {parent} answer {answer}'.format(
                     uid=user.uid,
                     child=user.user_info.name,
                     parent=user.parent.user_info.name,
@@ -62,7 +62,8 @@ class SimulationManager(object):
         for contact in user.contacts:
             forward = uniform(0, 1)
             if forward < self._settings['forwarding_prob']:
-                print 'User id: {uid} forwards message'.format(
+                print 'User {name} id={uid} forwards message'.format(
+                    name=contact.user_info.name,
                     uid=contact.uid
                 )
                 self._invoke(contact, depth+1)
@@ -78,14 +79,20 @@ def main(argv, *args, **kwargs):
         config = config_json.read()
         settings = json.loads(config)
 
-    tree = ContactsTree(5)
+    tree = ContactsTree(3)
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)
     simulator.start_simulation()
 
     stats = simulator.statistics()
-    print 'Statistics: {}'. format(stats)
+
+    print '\nAggregated data...'
+    for answer, votes in stats.iteritems():
+        print 'Answer "{answer}" got {votes}% of votes'.format(
+            answer=answer,
+            votes=votes
+        )
 
 
 if __name__ == '__main__':
