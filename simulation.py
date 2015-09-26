@@ -1,9 +1,8 @@
-import string
 import sys
-import json
 import random
+from random import uniform
 
-from random import uniform, choice
+from contacts_manager import ContactsTree
 
 
 class Controller(object):
@@ -20,9 +19,8 @@ class Controller(object):
     def __repr__(self):
         return '{}'.format(self._sender)
 
-    def evaluate(self):
+    def start_simulation(self):
         self._invoke(self._sender, 1)
-        print self._sender.replies
 
     def _invoke(self, user, depth):
         self._current_time += random.gauss(6, 1)
@@ -54,105 +52,6 @@ class Controller(object):
                 user.parent.replies.append(item)
 
 
-class User(object):
-
-    def __init__(self, user_info, contacts=None):
-        self._uid = self._generate_uid(8)
-        self._contacts = [] if contacts is None else contacts
-        self._user_info = user_info
-        self._replies = []
-        self._parent = None
-
-    def _generate_uid(self, length):
-        symbols = [random.choice(string.ascii_letters + string.digits) for i in xrange(length)]
-        return string.join(symbols, '')
-
-    def _traverse(self, root, users):
-        users.append(root.to_dict())
-        for contact in root.contacts:
-            self._traverse(contact, users)
-        return users
-
-    def traverse(self):
-        return self._traverse(self, [])
-
-    def to_dict(self):
-        info = self._user_info.to_dict()
-        info.update(dict(uid=self._uid))
-        return info
-
-    @property
-    def user_info(self):
-        return self._user_info
-
-    @property
-    def uid(self):
-        return self._uid
-
-    @property
-    def replies(self):
-        return self._replies
-
-    @property
-    def contacts(self):
-        return self._contacts
-
-    @contacts.setter
-    def contacts(self, contacts_collection):
-        if len(self._contacts) == 0:
-            self._contacts = contacts_collection
-        else:
-            for contact in contacts_collection:
-                self._contacts.append(contact)
-
-    @property
-    def parent(self):
-        return self._parent
-
-    @parent.setter
-    def parent(self, user):
-        self._parent = user
-
-    def answer(self, question, answers):
-        return choice(answers)
-
-    def add_contact(self, contact=None):
-        if contact is not None:
-            contact.parent = self
-            self._contacts.append(contact)
-
-    def add_contacts(self, contacts=None):
-        if contacts is not None:
-            for contact in contacts:
-                self.add_contact(contact)
-
-    def __repr__(self):
-        return self._uid
-
-
-class UserInfo(object):
-
-    def __init__(self, name, age, gender):
-        self.name = name
-        self.age = age
-        self.gender = gender
-
-    def __repr__(self):
-        user_string = 'User: {name}, age: {age}, gender: {gender}'.format(
-            name=self.name,
-            age=self.age,
-            gender=self.gender
-        )
-        return user_string
-
-    def to_dict(self):
-        return self.__dict__
-
-
-class Parser(object):
-    pass
-
-
 def main(argv, *args, **kwargs):
     settings = {
         'question': 'How long is your dick?',
@@ -161,18 +60,13 @@ def main(argv, *args, **kwargs):
         'forwarding_prob': 1.0 
     }
 
-    roman = User(UserInfo('Roman', 25, 'Male'))
-    gabe = User(UserInfo('Gabe', 27, 'Male'))
-    ola = User(UserInfo('Ola', 25, 'Female'))
-    victoria = User(UserInfo('Victoria', 22, 'Female'))
+    tree = ContactsTree(2)
+    sender = tree.generate_tree()
 
-    gabe.add_contact(ola)
+    controller = Controller(sender=sender, settings=settings)
+    controller.start_simulation()
 
-    roman.add_contact(gabe)
-    roman.add_contact(victoria)
-
-    controller = Controller(sender=roman, settings=settings)
-    controller.evaluate()
+    print sender.replies
 
 
 if __name__ == '__main__':

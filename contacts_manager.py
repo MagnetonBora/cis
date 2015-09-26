@@ -1,12 +1,106 @@
 from random import choice, Random, randint
 import math
+import string
 
-from simulation import UserInfo, User
+
+class User(object):
+
+    def __init__(self, user_info, contacts=None):
+        self._uid = self._generate_uid(8)
+        self._contacts = [] if contacts is None else contacts
+        self._user_info = user_info
+        self._replies = []
+        self._parent = None
+
+    def _generate_uid(self, length):
+        symbols = [choice(string.ascii_letters + string.digits) for i in xrange(length)]
+        return string.join(symbols, '')
+
+    def _traverse(self, root, users):
+        users.append(root)
+        for contact in root.contacts:
+            self._traverse(contact, users)
+        return users
+
+    def traverse(self):
+        return self._traverse(self, [])
+
+    def to_dict(self):
+        info = self._user_info.to_dict()
+        info.update(dict(uid=self._uid))
+        return info
+
+    @property
+    def user_info(self):
+        return self._user_info
+
+    @property
+    def uid(self):
+        return self._uid
+
+    @property
+    def replies(self):
+        return self._replies
+
+    @property
+    def contacts(self):
+        return self._contacts
+
+    @contacts.setter
+    def contacts(self, contacts_collection):
+        if len(self._contacts) == 0:
+            self._contacts = contacts_collection
+        else:
+            for contact in contacts_collection:
+                self._contacts.append(contact)
+
+    @property
+    def parent(self):
+        return self._parent
+
+    @parent.setter
+    def parent(self, user):
+        self._parent = user
+
+    def answer(self, question, answers):
+        return choice(answers)
+
+    def add_contact(self, contact=None):
+        if contact is not None:
+            contact.parent = self
+            self._contacts.append(contact)
+
+    def add_contacts(self, contacts=None):
+        if contacts is not None:
+            for contact in contacts:
+                self.add_contact(contact)
+
+    def __repr__(self):
+        return self._uid
+
+
+class UserInfo(object):
+
+    def __init__(self, name, age, gender):
+        self.name = name
+        self.age = age
+        self.gender = gender
+
+    def __repr__(self):
+        user_string = 'User: {name}, age: {age}, gender: {gender}'.format(
+            name=self.name,
+            age=self.age,
+            gender=self.gender
+        )
+        return user_string
+
+    def to_dict(self):
+        return self.__dict__
 
 
 class ContactsManager(object):
     _names = ['Joe', 'Sam', 'Gabe',
-              'Jessy', 'Mike', 'Ola', 'Jack', 'Joe']
+              'Jessy', 'Mike', 'Ola', 'Jack']
     _genders = ['M', 'F']
 
     def __init__(self):
@@ -35,20 +129,17 @@ class ContactsTree(object):
         self.manager = ContactsManager()
 
     def _generate_tree(self, user, depth):
-        if depth != 0:
+        user.contacts = self.manager.generate_contacts(randint(3, 5))
+        if depth >= 0:
             for contact in user.contacts:
+                contact.parent = user
                 self._generate_tree(contact, depth-1)
-        user.contacts = self.manager.generate_contacts(randint(5, 8))
 
-    def generate_tree(self, depth):
+    def generate_tree(self):
         user = self.manager.generate_contacts(1)[0]
-        self._generate_tree(user, depth-1)
+        self._generate_tree(user, self.depth-1)
         return user
 
 
 class ContactsTreeVisualizer(object):
-    pass
-
-
-if __name__ == '__main__':
     pass
