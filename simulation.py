@@ -1,11 +1,13 @@
+import json
 import sys
 import random
 from random import uniform
+import math
 
 from contacts_manager import ContactsTree
 
 
-class Controller(object):
+class SimulationManager(object):
 
     def __init__(self, sender, settings):
         self._current_time = 0
@@ -19,11 +21,25 @@ class Controller(object):
     def __repr__(self):
         return '{}'.format(self._sender)
 
+    def statistics(self):
+        replies = self._sender.replies
+        stats = dict((item, replies.count(item)) for item in replies)
+        total_answers = float(sum(stats.values()))
+        stats_relative = {
+            k: math.floor(100*v/total_answers)
+            for k, v in stats.iteritems()
+        }
+        return tuple(stats.items() + stats_relative.items())
+
     def start_simulation(self):
         self._invoke(self._sender, 1)
 
     def _invoke(self, user, depth):
         self._current_time += random.gauss(6, 1)
+
+        print 'Current time: {current_time}'.format(
+            current_time=self._current_time
+        )
 
         if self._current_time > self._time_limit:
             return
@@ -33,18 +49,22 @@ class Controller(object):
 
         reply = uniform(0, 1)
         if reply < self._settings['reply_prob']:
-            answer = user.answer(self._question, self._answers)
+            answer = user.answer(self._answers)
             if user.parent is not None:
-                print 'User id: {uid} {child} replies to {parent}'.format(
+                print 'User id: {uid} {child} replies to {parent} answer {answer}'.format(
                     uid=user.uid,
                     child=user.user_info.name,
-                    parent=user.parent.user_info.name
+                    parent=user.parent.user_info.name,
+                    answer=answer
                 )
                 user.parent.replies.append(answer)
 
         for contact in user.contacts:
             forward = uniform(0, 1)
             if forward < self._settings['forwarding_prob']:
+                print 'User id: {uid} forwards message'.format(
+                    uid=contact.uid
+                )
                 self._invoke(contact, depth+1)
 
         if user.parent is not None:
@@ -53,26 +73,19 @@ class Controller(object):
 
 
 def main(argv, *args, **kwargs):
-    settings = {
-        'question': 'How long is your dick?',
-        'answers': ['Big', 'Small', 'Medium', 'Very small', 'XXL'],
-        'reply_prob': 1.0,
-        'forwarding_prob': 1.0 
-    }
 
-    tree = ContactsTree(2)
+    with open('config.json', 'r') as config_json:
+        config = config_json.read()
+        settings = json.loads(config)
+
+    tree = ContactsTree(5)
     sender = tree.generate_tree()
 
-    controller = Controller(sender=sender, settings=settings)
-    controller.start_simulation()
+    simulator = SimulationManager(sender=sender, settings=settings)
+    simulator.start_simulation()
 
-    replies = sender.replies
-    counted_replies = dict(
-        (item, replies.count(item))
-        for item in replies
-    )
-
-    print 'Statistics: {}'. format(counted_replies)
+    stats = simulator.statistics()
+    print 'Statistics: {}'. format(stats)
 
 
 if __name__ == '__main__':

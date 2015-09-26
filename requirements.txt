@@ -1,6 +1,8 @@
 argparse==1.2.1
+click==5.1
 decorator==4.0.2
 funcsigs==0.4
+ipdb==0.8.1
 ipython==4.0.0
 ipython-genutils==0.1.0
 matplotlib==1.4.3

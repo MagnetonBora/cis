@@ -62,7 +62,7 @@ class User(object):
     def parent(self, user):
         self._parent = user
 
-    def answer(self, question, answers):
+    def answer(self, answers):
         return choice(answers)
 
     def add_contact(self, contact=None):
@@ -129,7 +129,7 @@ class ContactsTree(object):
         self.manager = ContactsManager()
 
     def _generate_tree(self, user, depth):
-        user.contacts = self.manager.generate_contacts(randint(3, 5))
+        user.contacts = self.manager.generate_contacts(randint(3, 10))
         if depth >= 0:
             for contact in user.contacts:
                 contact.parent = user
