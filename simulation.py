@@ -66,7 +66,13 @@ def main(argv, *args, **kwargs):
     controller = Controller(sender=sender, settings=settings)
     controller.start_simulation()
 
-    print sender.replies
+    replies = sender.replies
+    counted_replies = dict(
+        (item, replies.count(item))
+        for item in replies
+    )
+
+    print 'Statistics: {}'. format(counted_replies)
 
 
 if __name__ == '__main__':
