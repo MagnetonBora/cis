@@ -11,7 +11,7 @@ class SimulationManager(object):
 
     def __init__(self, sender, settings):
         self._current_time = 0
-        self._time_limit = float("inf")
+        self._time_limit = settings['time_limit']
         self._max_depth = 10
         self._sender = sender
         self._settings = settings
@@ -79,7 +79,7 @@ def main(argv, *args, **kwargs):
         config = config_json.read()
         settings = json.loads(config)
 
-    tree = ContactsTree(3)
+    tree = ContactsTree(5)
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)

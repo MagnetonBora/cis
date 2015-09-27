@@ -1,6 +1,7 @@
 {
   "question": "How long is your dick?",
   "answers": ["Big", "Small", "Medium", "Very small", "XXL"],
+  "time_limit": 1000,
   "reply_prob": 1.0,
   "forwarding_prob": 1.0
 }
