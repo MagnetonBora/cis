@@ -1,6 +1,6 @@
 {
-  "question": "How long is your dick?",
-  "answers": ["Big", "Small", "Medium", "Very small", "XXL"],
+  "question": "What are the best movie?",
+  "answers": ["A Beautiful mind", "Terminator", "Matrix"],
   "time_limit": 1000,
   "reply_prob": 1.0,
   "forwarding_prob": 1.0

@@ -4,7 +4,7 @@ import random
 from random import uniform
 import math
 
-from utils import ContactsTree
+from utils import ContactsTree, visualize_graph
 
 
 class SimulationManager(object):
@@ -79,7 +79,7 @@ def main(argv, *args, **kwargs):
         config = config_json.read()
         settings = json.loads(config)
 
-    tree = ContactsTree(5)
+    tree = ContactsTree(3)
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)
@@ -94,6 +94,12 @@ def main(argv, *args, **kwargs):
             votes=votes
         )
 
+    print '\nContacts tree:'
+    nodes = sender.traverse()
+    for node in nodes:
+        print node
+
+    visualize_graph(nodes)
 
 if __name__ == '__main__':
     main(sys.argv)

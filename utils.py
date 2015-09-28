@@ -1,6 +1,8 @@
 from random import choice, Random, randint
 import math
 import string
+import networkx as nx
+import matplotlib.pyplot as plt
 
 
 def read_names(file_path):
@@ -8,6 +10,15 @@ def read_names(file_path):
         names = input_file.readlines()
     return names
 
+def visualize_graph(nodes):
+    G = nx.Graph()
+
+    for node in nodes:
+        for contact in node['contacts']:
+            G.add_edge(node['id'], contact.uid)
+
+    nx.draw_spectral(G)
+    plt.show()
 
 class User(object):
 
@@ -23,7 +34,12 @@ class User(object):
         return string.join(symbols, '')
 
     def _traverse(self, root, users):
-        users.append(root)
+        item = dict(
+            id=root.uid,
+            name=root.user_info.name,
+            contacts=root.contacts
+        )
+        users.append(item)
         for contact in root.contacts:
             self._traverse(contact, users)
         return users
@@ -82,7 +98,10 @@ class User(object):
                 self.add_contact(contact)
 
     def __repr__(self):
-        return self._uid
+        return "Name: {name}, id: {id}".format(
+            name=self._user_info.name,
+            id=self._uid
+        )
 
 
 class UserInfo(object):
@@ -134,7 +153,7 @@ class ContactsTree(object):
         self.manager = ContactsManager()
 
     def _generate_tree(self, user, depth):
-        user.contacts = self.manager.generate_contacts(randint(3, 10))
+        user.contacts = self.manager.generate_contacts(randint(3, 5))
         if depth >= 0:
             for contact in user.contacts:
                 contact.parent = user
@@ -145,6 +164,3 @@ class ContactsTree(object):
         self._generate_tree(user, self.depth-1)
         return user
 
-
-class ContactsTreeVisualizer(object):
-    pass
