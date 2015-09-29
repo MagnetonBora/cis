@@ -79,7 +79,7 @@ def main(argv, *args, **kwargs):
         config = config_json.read()
         settings = json.loads(config)
 
-    tree = ContactsTree(3)
+    tree = ContactsTree(settings['depth'])
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)

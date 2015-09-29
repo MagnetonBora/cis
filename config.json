@@ -3,5 +3,6 @@
   "answers": ["A Beautiful mind", "Terminator", "Matrix"],
   "time_limit": 1000,
   "reply_prob": 1.0,
-  "forwarding_prob": 1.0
+  "forwarding_prob": 1.0,
+  "depth": 1
 }

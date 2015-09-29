@@ -13,12 +13,21 @@ def read_names(file_path):
 def visualize_graph(nodes):
     G = nx.Graph()
 
+    node_labels = {}
     for node in nodes:
         for contact in node['contacts']:
             G.add_edge(node['id'], contact.uid)
+            node_labels[contact.uid] = contact.uid
 
-    nx.draw_spectral(G)
+    settings = {        
+        'node_shape': 'o',
+        'with_lables': True,
+        'labels': node_labels
+    }
+
+    nx.draw_graphviz(G, **settings)
     plt.show()
+
 
 class User(object):
 
