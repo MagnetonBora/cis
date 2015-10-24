@@ -46,6 +46,8 @@ class User(object):
         item = dict(
             id=root.uid,
             name=root.user_info.name,
+            age=root.user_info.age,
+            gender=root.user_info.gender,
             contacts=root.contacts
         )
         users.append(item)

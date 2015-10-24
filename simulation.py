@@ -4,7 +4,7 @@ import random
 from random import uniform
 import math
 
-from utils import ContactsTree, visualize_graph
+from utils import User, ContactsTree, visualize_graph
 
 
 class SimulationManager(object):
@@ -73,6 +73,11 @@ class SimulationManager(object):
                 user.parent.replies.append(item)
 
 
+def serializer(obj):
+    if isinstance(obj, User):
+        return obj.to_dict()
+
+
 def main(argv, *args, **kwargs):
 
     with open('config.json', 'r') as config_json:
@@ -94,12 +99,11 @@ def main(argv, *args, **kwargs):
             votes=votes
         )
 
-    print '\nContacts tree:'
-    nodes = sender.traverse()
-    for node in nodes:
-        print node
+    # TODO: put here command line key
+    json_nodes = json.dumps(sender.traverse(), default=serializer, indent=4)
+    print '\nContacts tree:\n{}'.format(json_nodes)
 
-    visualize_graph(nodes)
+    # visualize_graph(nodes)
 
 if __name__ == '__main__':
     main(sys.argv)
