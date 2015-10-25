@@ -4,5 +4,9 @@
   "time_limit": 1000,
   "reply_prob": 1.0,
   "forwarding_prob": 1.0,
-  "depth": 1
+  "depth": 1,
+  "age_params": {
+      "avg_age": 25,
+      "age_dev": 4
+  }
 }

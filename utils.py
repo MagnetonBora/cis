@@ -155,8 +155,8 @@ class ContactsManager(object):
         return [contact for contact in contacts]
 
     def generate_contact(self, config):
-        avg_age = config['age_params']['avg_age']
-        avg_dev = config['age_params']['age_dev']
+        avg_age = config['avg_age']
+        avg_dev = config['age_dev']
         user_info = UserInfo(
             choice(self._names),
             self._generate_age(avg_age, avg_dev),

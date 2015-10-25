@@ -127,13 +127,7 @@ def main(
         config = config_json.read()
         settings = json.loads(config)
 
-    config = {
-        'age_params': {
-            'avg_age': 25,
-            'age_dev': 4
-        }
-    }
-    tree = ContactsTree(settings['depth'], config)
+    tree = ContactsTree(settings['depth'], settings['age_params'])
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)
@@ -158,7 +152,10 @@ def main(
 
     if show_age_clusterization:
         figure(2)
-        hist(generate_age_ranges(1000, 25, 2), bins=50)
+        hist(
+            generate_age_ranges(1000, settings['age_params']['avg_age'], settings['age_params']['age_dev']),
+            bins=50
+        )
         pylab.show()
 
     if show_all_contacts:
