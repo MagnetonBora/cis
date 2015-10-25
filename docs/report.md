@@ -71,7 +71,7 @@ For example:
     Answer "A Beautiful mind" got 40.0% of votes
     Answer "Matrix" got 60.0% of votes
 2. Show looping prevention.
-According to our assumptions we store contacts as a tree structure. By definition this structure can't have cycles, therefore there is no cross-connection between nodes. We have only connections of type parent-child. There're no neither parent-parent nor child-child connections. Thus, loops can't appear.
+According to our assumptions we store contacts as a tree structure. By definition this structure can't have cycles, therefore there is no cross-connection between nodes. We have only connections of type parent-child. There're neither parent-parent nor child-child connections. Thus, loops can't appear.
 3. Simulate profile?
 In order to simulate profile we've written ```ContactsManager``` and ```ContactsTree``` classes. These components are supposed to generate profile and tree of contacts.
 ```ContactsManager``` generates a random profile by combining name, gender and age (a few words about generation of age will be said next).
@@ -119,11 +119,11 @@ Example of generated contacts tree is given next.
 4. Simulate profile spreading (not clear)
 5. Simulate QP
 6. How do we simulate the age? How to model age clustering (what parameters describe age clustering)?
-We've made an assumption that a person has mostly friends of his age range. Another words the probability to have a friend of 26 years old is higher than probability to have friend of 60 years old for person who is 24.
+We've made an assumption that a person has mostly friends of his age range. In other words, the probability to have a friend of 26 years old is higher than probability to have friend of 60 years old, for person who is 24.
 Hense, we assume that age ranges of a person's friends are disributed according to Gauss's law.
 To simulate age ranges we generate normal distributed random numbers.
-Sinse we model age generation as normal destibuted random values we have two major paramters: mean and standart deaviation. More precisely we have the following distribution function $ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$. Here $\mu$ - average age of person (mean), $\sigma$ - age standart deviation.
-To see age ranges distribution in simulation you need to
+Sinse we model age generation as normal destibuted random values we have two major parameters: mean and standart deaviation. More precisely we have the following distribution function $ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$. Here $\mu$ - average age of person (mean), $\sigma$ - age standart deviation.
+To see age ranges distribution in simulation you need to use
 ```--show-age-clusterization``` key.
 
 Example:
@@ -133,14 +133,14 @@ Example:
 ![enter image description here](http://snag.gy/c0ikj.jpg)
 
 
-1. Oportunistic profile spreading. Piggybacking. We agregate all the information in transitional nodes.
-2. What parameters influence on reply willingness factor?
+1. Oportunistic profile spreading. We agregate all the information in transitional nodes.
+2. What parameters influence reply willingness factor?
 Reply event in our simulation system is a random event. The probability of this random event has exponential distribution.
 The probability density function looks as follows $f(x) = \lambda e^{-\lambda x}$. In our case parameter $\lambda=\frac{1}{age}$.
-We interpret such assumptions as follows. The older person is the less probability he replies.
+We interpret such assumptions as follows. Probability of reply grows back proportional to person age.
 Next figure show the probability density of exponential distribution.
 ![enter image description here](http://www.engineeredsoftware.com/nasa/images/expone1.gif)
-3. What parameters influence on forward willingness factor?
+3. What parameters influence forward willingness factor?
 We have the same assumptions and math uder it as it was in section 2.
 4. Reply speed. ***Unknown***.
 5. Request margin. The total number of replies is up to the user. A user determines how many replies he needs.
