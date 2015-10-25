@@ -1,14 +1,15 @@
-from random import choice, Random, randint
 import math
+import random
 import string
 import networkx as nx
 import matplotlib.pyplot as plt
 
+from random import choice, Random, randint
 
 def read_names(file_path):
     with open(file_path, 'r') as input_file:
         names = input_file.readlines()
-    return names
+    return map(lambda name: name.replace("\n", ""), names)
 
 def visualize_graph(nodes):
     G = nx.Graph()
@@ -141,37 +142,45 @@ class ContactsManager(object):
     def __init__(self):
         self._names = read_names('data/names.dat')
 
-    def _contacts_generator(self, count, age_range):
-        random = Random()
-        min_age, max_age = age_range
+    def _generate_age(self, avg_age, age_dev):
+        return int(random.gauss(avg_age, age_dev))
+
+    def _contacts_generator(self, config, count):
         for i in xrange(count):
-            user_info = UserInfo(
-                choice(self._names),
-                math.floor(random.uniform(min_age, max_age)),
-                choice(self._genders)
-            )
+            user_info = self.generate_contact(config)
             yield User(user_info)
 
-    def generate_contacts(self, count, age_range=(15, 60)):
-        contacts = self._contacts_generator(count, age_range)
+    def generate_contacts(self, config, count):
+        contacts = self._contacts_generator(config, count)
         return [contact for contact in contacts]
+
+    def generate_contact(self, config):
+        avg_age = config['age_params']['avg_age']
+        avg_dev = config['age_params']['age_dev']
+        user_info = UserInfo(
+            choice(self._names),
+            self._generate_age(avg_age, avg_dev),
+            choice(self._genders)
+        )
+        return user_info
 
 
 class ContactsTree(object):
 
-    def __init__(self, depth):
+    def __init__(self, depth, config):
+        self.config = config
         self.depth = depth
         self.manager = ContactsManager()
 
     def _generate_tree(self, user, depth):
-        user.contacts = self.manager.generate_contacts(randint(3, 5))
+        count = randint(3, 5)
+        user.contacts = self.manager.generate_contacts(self.config, count)
         if depth >= 0:
             for contact in user.contacts:
                 contact.parent = user
                 self._generate_tree(contact, depth-1)
 
     def generate_tree(self):
-        user = self.manager.generate_contacts(1)[0]
+        user = User(self.manager.generate_contact(self.config))
         self._generate_tree(user, self.depth-1)
         return user
-

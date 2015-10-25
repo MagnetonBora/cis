@@ -1,10 +1,18 @@
 import json
 import sys
 import random
-from random import uniform
+import click
 import math
+import pylab
 
+from random import uniform
+from pylab import figure
+from matplotlib.pyplot import hist
 from utils import User, ContactsTree, visualize_graph
+
+
+def generate_age_ranges(count=100, mu=0, sigma=1):
+    return [mu + sigma * random.gauss(0, 1) for i in xrange(count)]
 
 
 class SimulationManager(object):
@@ -17,6 +25,7 @@ class SimulationManager(object):
         self._settings = settings
         self._question = settings['question']
         self._answers = settings['answers']
+        self._avg_request_number = 0
 
     def __repr__(self):
         return '{}'.format(self._sender)
@@ -31,11 +40,15 @@ class SimulationManager(object):
         }
         return stats_relative
 
+    def average_request_number(self):
+        return self._avg_request_number
+
     def start_simulation(self):
         self._invoke(self._sender, 1)
 
     def _invoke(self, user, depth):
         self._current_time += random.gauss(1, 0.1)
+        self._avg_request_number += 1
 
         print 'Current time: {current_time}'.format(
             current_time=self._current_time
@@ -47,7 +60,7 @@ class SimulationManager(object):
         if depth > self._max_depth:
             return
 
-        reply = uniform(0, 1)
+        reply = -math.log(random.random() + 0.0001)/user.user_info.age
         if reply < self._settings['reply_prob']:
             answer = user.answer(self._answers)
             if user.parent is not None:
@@ -60,7 +73,7 @@ class SimulationManager(object):
                 user.parent.replies.append(answer)
 
         for contact in user.contacts:
-            forward = uniform(0, 1)
+            forward = -math.log(random.random() + 0.0001)/contact.user_info.age
             if forward < self._settings['forwarding_prob']:
                 print 'User {name} id={uid} forwards message'.format(
                     name=contact.user_info.name,
@@ -78,32 +91,80 @@ def serializer(obj):
         return obj.to_dict()
 
 
-def main(argv, *args, **kwargs):
+@click.command()
+@click.option(
+    '--show-age-clusterization',
+    is_flag=True,
+    default=False,
+    help='Show age clusterization histogram'
+)
+@click.option(
+    '--show-contacts-tree',
+    is_flag=True,
+    default=False,
+    help='Show contacts tree'
+)
+@click.option(
+    '--show-total-statistics',
+    is_flag=True,
+    default=False,
+    help='Show total statistics'
+)
+@click.option(
+    '--show-all-contacts',
+    is_flag=True,
+    default=False,
+    help='Show all contacts'
+)
+def main(
+    show_age_clusterization,
+    show_contacts_tree,
+    show_total_statistics,
+    show_all_contacts
+):
 
     with open('config.json', 'r') as config_json:
         config = config_json.read()
         settings = json.loads(config)
 
-    tree = ContactsTree(settings['depth'])
+    config = {
+        'age_params': {
+            'avg_age': 25,
+            'age_dev': 4
+        }
+    }
+    tree = ContactsTree(settings['depth'], config)
     sender = tree.generate_tree()
 
     simulator = SimulationManager(sender=sender, settings=settings)
     simulator.start_simulation()
+    nodes = sender.traverse()
 
-    stats = simulator.statistics()
+    if show_total_statistics:
+        stats = simulator.statistics()
+        click.echo('\nAverage request number: {}'.format(simulator.average_request_number()))
+        click.echo('\nAggregated data...')
+        for answer, votes in stats.iteritems():
+            click.echo(
+                'Answer "{answer}" got {votes}% of votes'.format(
+                    answer=answer,
+                    votes=votes
+                )
+            )
+    
+    if show_contacts_tree:
+        figure(1)
+        visualize_graph(nodes)
 
-    print '\nAggregated data...'
-    for answer, votes in stats.iteritems():
-        print 'Answer "{answer}" got {votes}% of votes'.format(
-            answer=answer,
-            votes=votes
-        )
+    if show_age_clusterization:
+        figure(2)
+        hist(generate_age_ranges(1000, 25, 2), bins=50)
+        pylab.show()
 
-    # TODO: put here command line key
-    json_nodes = json.dumps(sender.traverse(), default=serializer, indent=4)
-    print '\nContacts tree:\n{}'.format(json_nodes)
+    if show_all_contacts:
+        json_nodes = json.dumps(nodes, default=serializer, indent=4)
+        click.echo('\nContacts tree:\n{}'.format(json_nodes))
 
-    # visualize_graph(nodes)
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
