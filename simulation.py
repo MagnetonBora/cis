@@ -26,6 +26,7 @@ class SimulationManager(object):
         self._question = settings['question']
         self._answers = settings['answers']
         self._avg_request_number = 0
+        self._use_profile_spreading = settings.get('use_profile_spreading', False)
 
     def __repr__(self):
         return '{}'.format(self._sender)
@@ -73,6 +74,9 @@ class SimulationManager(object):
                 user.parent.replies.append(answer)
 
         for contact in user.contacts:
+            if self._use_profile_spreading and contact.user_info.age > user.user_info.age:
+                continue
+
             forward = -math.log(random.random() + 0.0001)/contact.user_info.age
             if forward < self._settings['forwarding_prob']:
                 print 'User {name} id={uid} forwards message'.format(
@@ -116,12 +120,15 @@ def serializer(obj):
     default=False,
     help='Show all contacts'
 )
-def main(
-    show_age_clusterization,
-    show_contacts_tree,
-    show_total_statistics,
-    show_all_contacts
-):
+@click.option(
+    '--use-profile-spreading',
+    is_flag=True,
+    default=False,
+    help='Use profile spreading'
+)
+def main(show_age_clusterization, show_contacts_tree,
+         show_total_statistics, show_all_contacts,
+         use_profile_spreading):
 
     with open('config.json', 'r') as config_json:
         config = config_json.read()
@@ -129,7 +136,8 @@ def main(
 
     tree = ContactsTree(settings['depth'], settings['age_params'])
     sender = tree.generate_tree()
-
+    settings.update(dict(use_profile_spreading=use_profile_spreading))
+    
     simulator = SimulationManager(sender=sender, settings=settings)
     simulator.start_simulation()
     nodes = sender.traverse()
