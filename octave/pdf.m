@@ -28,7 +28,7 @@ set(gca, 'linewidth', 2, 'fontsize', 12);
 xlabel('Ages');
 ylabel('Probability');
 title('Illustration of clasterization factor');
-legend('Q=1', 'Q=2', 'Q=3', 'Q=4', 'Q=0.01');
+legend('Q=0.10', 'Q=0.25', 'Q=0.50', 'Q=0.75', 'Q=0.99');
 xlim([45; 55]);
 ylim([0; 1]);
 grid on;
