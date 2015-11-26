@@ -76,6 +76,13 @@ class SimulationManager(object):
                     )
                 )
                 user.parent.replies.append(answer)
+                logger.info(
+                    'Piggybacking! User {} found out that {} is {} years old'.format(
+                        user.user_info.name,
+                        user.parent.user_info.name,
+                        int(user.user_info.age)
+                    )
+                )
 
         for contact in user.contacts:
             if self._use_profile_spreading and contact.user_info.age > user.user_info.age:
