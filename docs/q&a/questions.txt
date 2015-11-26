@@ -406,6 +406,20 @@ Based on clusterization factor values we're able to find correspondent value of 
 
 ![enter image description here](http://snag.gy/zpPau.jpg)
 
+|     Q   |    $\sigma$   |
+| ------- |:-------------:|
+| 0.00000 |     $\infty$  |
+| 0.10000 |     9.00000   |
+| 0.20000 |     4.00000   |
+| 0.30000 |     2.33333   |
+| 0.40000 |     1.50000   |
+| 0.50000 |     1.00000   |
+| 0.60000 |     0.66667   |
+| 0.70000 |     0.42857   |
+| 0.80000 |     0.25000   |
+| 0.90000 |     0.11111   |
+| 1.00000 |     0.00000   |
+
 On the next image a few pdf are given with different value of $Q$-parameter.
 
 ![enter image description here](http://snag.gy/lrTRE.jpg)

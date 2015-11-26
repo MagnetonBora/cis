@@ -4,6 +4,18 @@
 		"selected_items":
 		[
 			[
+				"__",
+				"__name__"
+			],
+			[
+				"logg",
+				"logging"
+			],
+			[
+				"lo",
+				"logger"
+			],
+			[
 				"se",
 				"settings"
 			],
@@ -32,26 +44,10 @@
 	"buffers":
 	[
 		{
-			"file": "docs/q&a/questions.txt",
+			"file": "simulation.py",
 			"settings":
 			{
-				"buffer_size": 21289,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "octave/pdf.m",
-			"settings":
-			{
-				"buffer_size": 932,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "octave/hyperbola.m",
-			"settings":
-			{
-				"buffer_size": 302,
+				"buffer_size": 5456,
 				"line_ending": "Unix"
 			}
 		}
@@ -114,21 +110,19 @@
 	},
 	"expanded_folders":
 	[
-		"/home/roman/projects/cis",
-		"/home/roman/projects/cis/docs",
-		"/home/roman/projects/cis/docs/q&a",
-		"/home/roman/projects/cis/octave"
+		"/home/roman/projects/cis"
 	],
 	"file_history":
 	[
+		"/home/roman/projects/cis/octave/hyperbola.m",
+		"/home/roman/projects/cis/octave/pdf.m",
+		"/home/roman/projects/cis/docs/q&a/questions.txt",
 		"/home/roman/projects/cis/simulation.py",
 		"/home/roman/Dropbox/Public/courses/upper-intermidiate/mail_home_work.txt",
-		"/home/roman/projects/cis/docs/q&a/questions.txt",
 		"/home/roman/Dropbox/Public/courses/upper-intermidiate/dictionary.txt",
 		"/home/roman/Dropbox/Public/courses/upper-intermidiate/home_works/page-14-ex-3a.txt",
 		"/home/roman/projects/cis/utils.py",
 		"/home/roman/projects/cis/out.log",
-		"/home/roman/projects/cis/octave/pdf.m",
 		"/home/roman/scripts/compute-files-md5sum.sh",
 		"/home/roman/approaches.txt",
 		"/home/roman/Dropbox/Public/courses/deutsch/deutsch.txt",
@@ -145,7 +139,7 @@
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -159,6 +153,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"help",
 			"ought",
 			"with",
 			"withdr",
@@ -205,24 +200,24 @@
 			[
 				{
 					"buffer": 0,
-					"file": "docs/q&a/questions.txt",
+					"file": "simulation.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 21289,
+						"buffer_size": 5456,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1,
-								1
+								90,
+								90
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"syntax": "Packages/Python/Python.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
@@ -231,62 +226,6 @@
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "octave/pdf.m",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 932,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								838,
-								838
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Objective-C/Objective-C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 153.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "octave/hyperbola.m",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 302,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								74,
-								74
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Matlab/Matlab.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -369,7 +308,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 125.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
