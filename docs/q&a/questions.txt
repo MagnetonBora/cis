@@ -1,0 +1,411 @@
+
+
+#***Q & A ***
+
+# 1. How to simulate age clustering?
+
+We've made an assumption that a person has mostly friends of his age range. In other words, the probability to have a friend of 26 years old is higher than probability to have friend of 60 years old, for person who is 24.
+Hense, we assume that age ranges of a person's friends are disributed according to Gauss's law.
+
+To simulate age ranges we generate normal distributed random numbers.
+Sinse we model age generation as normal destibuted random values we have two major parameters: mean and standart deaviation. More precisely we have the following distribution function $ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$. Here $\mu$ - average age of person (mean), $\sigma$ - age standard deviation.
+Another words $\mu$ -- is the most probable age of a person in a contacts list, whereas $\sigma$ -- deviation of the most probable age.
+
+We have chosen this distribution law because it describes a number of random processes in nature with enough precision.
+
+To see age ranges distribution in simulation you need to use
+```--show-age-clusterization``` key.
+
+Example:
+
+    python simulation.py --show-age-clusterization
+
+![enter image description here](http://snag.gy/c0ikj.jpg)
+
+In general this is simplified approach of contacts set modelling. In section #8 we will introduce a new parameter -- Clasterization factor, which we'll take into account in a model discussed in this section.
+
+#2. How to model willingness of reply?
+
+According to our simulation algorithm after user gets the message he waits random time interval. This random time has uniform distribution.
+
+$ f(t) = \begin{cases} \frac{1}{b-a}, & \mbox{if } n \in [a, b] \\ 0, & \mbox{if } n \notin [a,b] \end{cases} $
+
+Here a = 30 sec, b = 1 min. In other words a user is given a time from 30 sec up to 1 min so as to think about the answer to request.
+
+After modelling pause, algorithm generates random event which simulates user's decision. In our case decision is uniform distributed random event with 50% probability to answer the question and make a reply.
+
+After this user has to decide whether he wants forward request or not. This phase we are going to discuss in next section.
+
+In `config.json` file there is a parameter **reply_prob** which determines probability of reply (obviously this value has to be from 0 to 1).
+
+#3. How to model willingness of forwarding?
+
+In this phase algorithm simulated random pause as well. We applied the same approach to simulate it as we did in paragraph 2. Which means that we use the same probability density function to simulate the forwarding decision pause:
+
+$ f(t) = \begin{cases} \frac{1}{b-a}, & \mbox{if } n \in [a, b] \\ 0, & \mbox{if } n \notin [a,b] \end{cases} $,
+
+where a = 30 sec, b = 1 min.
+
+After pause a user has to decide whether he wants to make forwarding or not. This is random event as well, but it has another probability density function.
+
+Obviously, probability of forwarding has to be proportional to number of contacts who have approximately the same age as user. Really, when user has a lot of friends with the same age, he probably decide to forward request to them.
+
+So, we have exponentional distributed random event with the following pdf.
+
+$f(x) = \lambda e^{-\lambda x}$
+
+Where $\lambda=\frac{1}{N}$, and N - is number of coevals.
+
+In `config.json` file there is parameter **forwarding_prob** which determines probability of forwarding. Since this is probability it has to be in range from 0 to 1. Obviously, to forbid forwarding by user `forwarding_prob` parameter has to be set to 0.
+
+# 4. How to model the delay of the reply?
+
+In our simulation algorithm reply delay is represented as normal distributed time intervals with $\mu$ = 1 min, $\sigma = 30 sec$.
+
+# 5. Lower bottom check SMS/REPLIES?
+
+Computed experimentally. Algorithms counts replies and requests during the simulation. SMS/REPLIES fraction is shown in total statistics. In order to see it you need to run program `--show-total-statistics` key.
+
+`python simulation.py --show-total-statistics`
+
+# 6. Simulation with and without profile spreading
+
+We've added ability to run simulation program with profile spreading.
+To use this option you need to run program with `--use-profile-spreading` key (by default this flag is True).
+
+The following command will run program with profile spreading mode and show statistics after simulations.
+
+    python simulation.py --use-profile-spreading \
+                         --show-total-statistics \
+                         --verbose
+**Important:** Flag `--verbose` will show you all debug information. If you don'r want to see such information on your console, don't use this flag.
+
+Results:
+
+    Current time: 0.780997431962
+    User Jeanie id=AhyD457H forwards message
+    Current time: 1.64141581082
+    User Jeanie id=AhyD457H replies to Wis answer Matrix
+    User Jeffersonian id=IPJaXmqw forwards message
+    Current time: 2.5773045679
+    User Ottawas id=wwNp9TkY forwards message
+    Current time: 3.44602879139
+    User Lind id=FZ0ydMUe forwards message
+    Current time: 4.4681237097
+    User Caucasoid id=dtu6oYBb forwards message
+    Current time: 5.49217361639
+    User Olivia id=QN9OwBfv forwards message
+    Current time: 6.38668015422
+    User Olivia id=QN9OwBfv replies to Wis answer Matrix
+    User Arius id=o4bCIBu9 forwards message
+    Current time: 7.49921213143
+    User Arius id=o4bCIBu9 replies to Wis answer A Beautiful mind
+    User Daisy id=JH1PfAsj forwards message
+    Current time: 8.57201857111
+    User Clint id=WdVTI9GZ forwards message
+    Current time: 9.44822525805
+    User Coulomb id=6c90HOhf forwards message
+    Current time: 10.4490026785
+    
+    Average request number: 8
+    
+    Aggregated data...
+    Answer "A Beautiful mind" got 33.0% of votes
+    Answer "Matrix" got 66.0% of votes
+
+Running simulation without profile spreading.
+
+    python simulation.py --show-total-statistics \
+                         --verbose
+
+Results:
+
+    Current time: 1.09705387695
+    User Lee id=2WHYc1Ie forwards message
+    Current time: 2.1976740491
+    User Lee id=2WHYc1Ie replies to Christy answer A Beautiful mind
+    User Chelyabinsk id=Ltgand8I forwards message
+    Current time: 3.24656721303
+    User Mithra id=X85QPBbr forwards message
+    Current time: 4.24137009181
+    User Jame id=Flu6sK6z forwards message
+    Current time: 5.13463376699
+    User Bialystok id=IGAzhtmK forwards message
+    Current time: 6.11306428373
+    User Izhevsk id=pqwYPy3U forwards message
+    Current time: 6.89216418214
+    User Napster id=BnoRELTj forwards message
+    Current time: 7.88733575176
+    User Napster id=BnoRELTj replies to Christy answer Matrix
+    User Sian id=r4B5LX3P forwards message
+    Current time: 8.90296404859
+    User Draco id=YK4JY1hh forwards message
+    Current time: 9.89867694925
+    User Calais id=8nz0UnQn forwards message
+    Current time: 10.9288623748
+    User Hansen id=W0jmZElr forwards message
+    Current time: 12.0324081339
+    User Terrence id=Ql6rurxj forwards message
+    Current time: 13.0659955212
+    User Prudential id=Heb2JcWg forwards message
+    Current time: 14.1540616581
+    User Prudential id=Heb2JcWg replies to Christy answer Matrix
+    User Rambo id=zqaDHdxH forwards message
+    Current time: 15.1360117947
+    User Nelda id=aWLuiErk forwards message
+    Current time: 16.1742352701
+    User MRI id=6mPrus1f forwards message
+    Current time: 17.1541193977
+    
+    Average request number: 17
+    
+    Aggregated data...
+    Answer "A Beautiful mind" got 33.0% of votes
+    Answer "Matrix" got 66.0% of votes
+   
+   **Summary:** as we can see by running simulation without profile spreading we got 17 requests in average, whereas running with profile spreading gives us 8 requests in average.
+
+# 7. How to model the number of contacts per individual user?
+
+During the simulation for each user a random set of contacts is generated. 
+**The number of contacts is a uniform distributed random value**. In our simulation we assume that user has at least 3 and not more than 5 contacts. We have chosen such numbers in order to not generate to huge tree of users.
+Let us try to estimate how many contacts in whole tree can be generated.
+Assume we have a tree of depth $d$. Consider each layer except first has exactly 3 nodes. In this case on first layer we have 1 node (because this is root of the tree), on second layer we have 3 nodes, on third - $3^3=27$ nodes, the layer number $d$ has $3^d$ nodes. We can see geometric series here -- the number of nodes on each layer is $3^d$. 
+The sum of first $n$ elements of geometric series can be calculated with the following formula $ S_{n} = b_1 \frac{1-q^d}{1-q}$.
+Obviously, $b_1=1$ because first layer has exactly one node.
+In case each layer has 3 nodes $S_3=\frac{1-3^d}{1-3}=\frac{3^d-1}{2}$.
+Similar with the second case, when each layer has 5 nodes $ S_{5} = \frac{1-5^d}{1-5}=\frac{5^d-1}{4}$.
+So, during simulation when each layer has from 3 up to 5 nodes, the total number of nodes $N$ in whole tree can be estimated in the following way:
+$\frac{3^d-1}{2} \leq N \leq \frac{5^d-1}{4}$.
+
+# 8. Clasterization factor
+
+In previous paragraphs we mentioned which approach was used in order to generate a set of contacts with random ages. Now we're going to go deeper.
+Let us define a new parameter. **Clasterization factor** is a modelling parameter which determines what age categories will be present in a user's contacts list.
+
+We will modify our contacts generation algorithm in such a way it will satisfy the following conditions:
+ 1. When clasterization factor is low we want to get a set of random ages close to uniform distribution.
+ 2. When clasterization factor is high we want to get a set of random ages close to normal distribution (in this case it means that user's contacts will have more or less the same age).
+
+Let us given the following pdf:
+
+$ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$.
+
+Here $\mu$ - average age of person (mean), $\sigma$ - age standart deviation. We're going to rewrite this formula in the following way.
+
+$ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^{\frac{2}{Q}}/2\sigma^2}$.
+
+Parameter $Q$ we will call clasterization factor. Let us have this parameter in range: $Q \in (0..1)$.
+Based on clusterization factor values we're able to find correspondent value of standart deviation. We could do it in the following way: $\sigma=\frac{1}{Q}-1$
+
+![enter image description here](http://snag.gy/zpPau.jpg)
+
+On the next image a few pdf are given with different value of $Q$-parameter.
+
+![enter image description here](http://snag.gy/lrTRE.jpg)
+
+
+
+#***Q & A ***
+
+# 1. How to simulate age clustering?
+
+We've made an assumption that a person has mostly friends of his age range. In other words, the probability to have a friend of 26 years old is higher than probability to have friend of 60 years old, for person who is 24.
+Hense, we assume that age ranges of a person's friends are disributed according to Gauss's law.
+
+To simulate age ranges we generate normal distributed random numbers.
+Sinse we model age generation as normal destibuted random values we have two major parameters: mean and standart deaviation. More precisely we have the following distribution function $ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$. Here $\mu$ - average age of person (mean), $\sigma$ - age standard deviation.
+Another words $\mu$ -- is the most probable age of a person in a contacts list, whereas $\sigma$ -- deviation of the most probable age.
+
+We have chosen this distribution law because it describes a number of random processes in nature with enough precision.
+
+To see age ranges distribution in simulation you need to use
+```--show-age-clusterization``` key.
+
+Example:
+
+    python simulation.py --show-age-clusterization
+
+![enter image description here](http://snag.gy/c0ikj.jpg)
+
+In general this is simplified approach of contacts set modelling. In section #8 we will introduce a new parameter -- Clasterization factor, which we'll take into account in a model discussed in this section.
+
+#2. How to model willingness of reply?
+
+According to our simulation algorithm after user gets the message he waits random time interval. This random time has uniform distribution.
+
+$ f(t) = \begin{cases} \frac{1}{b-a}, & \mbox{if } n \in [a, b] \\ 0, & \mbox{if } n \notin [a,b] \end{cases} $
+
+Here a = 30 sec, b = 1 min. In other words a user is given a time from 30 sec up to 1 min so as to think about the answer to request.
+
+After modelling pause, algorithm generates random event which simulates user's decision. In our case decision is uniform distributed random event with 50% probability to answer the question and make a reply.
+
+After this user has to decide whether he wants forward request or not. This phase we are going to discuss in next section.
+
+In `config.json` file there is a parameter **reply_prob** which determines probability of reply (obviously this value has to be from 0 to 1).
+
+#3. How to model willingness of forwarding?
+
+In this phase algorithm simulated random pause as well. We applied the same approach to simulate it as we did in paragraph 2. Which means that we use the same probability density function to simulate the forwarding decision pause:
+
+$ f(t) = \begin{cases} \frac{1}{b-a}, & \mbox{if } n \in [a, b] \\ 0, & \mbox{if } n \notin [a,b] \end{cases} $,
+
+where a = 30 sec, b = 1 min.
+
+After pause a user has to decide whether he wants to make forwarding or not. This is random event as well, but it has another probability density function.
+
+Obviously, probability of forwarding has to be proportional to number of contacts who have approximately the same age as user. Really, when user has a lot of friends with the same age, he probably decide to forward request to them.
+
+So, we have exponentional distributed random event with the following pdf.
+
+$f(x) = \lambda e^{-\lambda x}$
+
+Where $\lambda=\frac{1}{N}$, and N - is number of coevals.
+
+In `config.json` file there is parameter **forwarding_prob** which determines probability of forwarding. Since this is probability it has to be in range from 0 to 1. Obviously, to forbid forwarding by user `forwarding_prob` parameter has to be set to 0.
+
+# 4. How to model the delay of the reply?
+
+In our simulation algorithm reply delay is represented as normal distributed time intervals with $\mu$ = 1 min, $\sigma = 30 sec$.
+
+# 5. Lower bottom check SMS/REPLIES?
+
+Computed experimentally. Algorithms counts replies and requests during the simulation. SMS/REPLIES fraction is shown in total statistics. In order to see it you need to run program `--show-total-statistics` key.
+
+`python simulation.py --show-total-statistics`
+
+# 6. Simulation with and without profile spreading
+
+We've added ability to run simulation program with profile spreading.
+To use this option you need to run program with `--use-profile-spreading` key (by default this flag is True).
+
+The following command will run program with profile spreading mode and show statistics after simulations.
+
+    python simulation.py --use-profile-spreading \
+                         --show-total-statistics \
+                         --verbose
+**Important:** Flag `--verbose` will show you all debug information. If you don'r want to see such information on your console, don't use this flag.
+
+Results:
+
+    Current time: 0.780997431962
+    User Jeanie id=AhyD457H forwards message
+    Current time: 1.64141581082
+    User Jeanie id=AhyD457H replies to Wis answer Matrix
+    User Jeffersonian id=IPJaXmqw forwards message
+    Current time: 2.5773045679
+    User Ottawas id=wwNp9TkY forwards message
+    Current time: 3.44602879139
+    User Lind id=FZ0ydMUe forwards message
+    Current time: 4.4681237097
+    User Caucasoid id=dtu6oYBb forwards message
+    Current time: 5.49217361639
+    User Olivia id=QN9OwBfv forwards message
+    Current time: 6.38668015422
+    User Olivia id=QN9OwBfv replies to Wis answer Matrix
+    User Arius id=o4bCIBu9 forwards message
+    Current time: 7.49921213143
+    User Arius id=o4bCIBu9 replies to Wis answer A Beautiful mind
+    User Daisy id=JH1PfAsj forwards message
+    Current time: 8.57201857111
+    User Clint id=WdVTI9GZ forwards message
+    Current time: 9.44822525805
+    User Coulomb id=6c90HOhf forwards message
+    Current time: 10.4490026785
+    
+    Average request number: 8
+    
+    Aggregated data...
+    Answer "A Beautiful mind" got 33.0% of votes
+    Answer "Matrix" got 66.0% of votes
+
+Running simulation without profile spreading.
+
+    python simulation.py --show-total-statistics \
+                         --verbose
+
+Results:
+
+    Current time: 1.09705387695
+    User Lee id=2WHYc1Ie forwards message
+    Current time: 2.1976740491
+    User Lee id=2WHYc1Ie replies to Christy answer A Beautiful mind
+    User Chelyabinsk id=Ltgand8I forwards message
+    Current time: 3.24656721303
+    User Mithra id=X85QPBbr forwards message
+    Current time: 4.24137009181
+    User Jame id=Flu6sK6z forwards message
+    Current time: 5.13463376699
+    User Bialystok id=IGAzhtmK forwards message
+    Current time: 6.11306428373
+    User Izhevsk id=pqwYPy3U forwards message
+    Current time: 6.89216418214
+    User Napster id=BnoRELTj forwards message
+    Current time: 7.88733575176
+    User Napster id=BnoRELTj replies to Christy answer Matrix
+    User Sian id=r4B5LX3P forwards message
+    Current time: 8.90296404859
+    User Draco id=YK4JY1hh forwards message
+    Current time: 9.89867694925
+    User Calais id=8nz0UnQn forwards message
+    Current time: 10.9288623748
+    User Hansen id=W0jmZElr forwards message
+    Current time: 12.0324081339
+    User Terrence id=Ql6rurxj forwards message
+    Current time: 13.0659955212
+    User Prudential id=Heb2JcWg forwards message
+    Current time: 14.1540616581
+    User Prudential id=Heb2JcWg replies to Christy answer Matrix
+    User Rambo id=zqaDHdxH forwards message
+    Current time: 15.1360117947
+    User Nelda id=aWLuiErk forwards message
+    Current time: 16.1742352701
+    User MRI id=6mPrus1f forwards message
+    Current time: 17.1541193977
+    
+    Average request number: 17
+    
+    Aggregated data...
+    Answer "A Beautiful mind" got 33.0% of votes
+    Answer "Matrix" got 66.0% of votes
+   
+   **Summary:** as we can see by running simulation without profile spreading we got 17 requests in average, whereas running with profile spreading gives us 8 requests in average.
+
+# 7. How to model the number of contacts per individual user?
+
+During the simulation for each user a random set of contacts is generated. 
+**The number of contacts is a uniform distributed random value**. In our simulation we assume that user has at least 3 and not more than 5 contacts. We have chosen such numbers in order to not generate to huge tree of users.
+Let us try to estimate how many contacts in whole tree can be generated.
+Assume we have a tree of depth $d$. Consider each layer except first has exactly 3 nodes. In this case on first layer we have 1 node (because this is root of the tree), on second layer we have 3 nodes, on third - $3^3=27$ nodes, the layer number $d$ has $3^d$ nodes. We can see geometric series here -- the number of nodes on each layer is $3^d$. 
+The sum of first $n$ elements of geometric series can be calculated with the following formula $ S_{n} = b_1 \frac{1-q^d}{1-q}$.
+Obviously, $b_1=1$ because first layer has exactly one node.
+In case each layer has 3 nodes $S_3=\frac{1-3^d}{1-3}=\frac{3^d-1}{2}$.
+Similar with the second case, when each layer has 5 nodes $ S_{5} = \frac{1-5^d}{1-5}=\frac{5^d-1}{4}$.
+So, during simulation when each layer has from 3 up to 5 nodes, the total number of nodes $N$ in whole tree can be estimated in the following way:
+$\frac{3^d-1}{2} \leq N \leq \frac{5^d-1}{4}$.
+
+# 8. Clasterization factor
+
+In previous paragraphs we mentioned which approach was used in order to generate a set of contacts with random ages. Now we're going to go deeper.
+Let us define a new parameter. **Clasterization factor** is a modelling parameter which determines what age categories will be present in a user's contacts list.
+
+We will modify our contacts generation algorithm in such a way it will satisfy the following conditions:
+ 1. When clasterization factor is low we want to get a set of random ages close to uniform distribution.
+ 2. When clasterization factor is high we want to get a set of random ages close to normal distribution (in this case it means that user's contacts will have more or less the same age).
+
+Let us given the following pdf:
+
+$ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^2/2\sigma^2}$.
+
+Here $\mu$ - average age of person (mean), $\sigma$ - age standart deviation. We're going to rewrite this formula in the following way.
+
+$ f(x) = \frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^{\frac{2}{Q}}/2\sigma^2}$.
+
+Parameter $Q$ we will call clasterization factor. Let us have this parameter in range: $Q \in (0..1)$.
+Based on clusterization factor values we're able to find correspondent value of standart deviation. We could do it in the following way: $\sigma=\frac{1}{Q}-1$
+
+![enter image description here](http://snag.gy/zpPau.jpg)
+
+On the next image a few pdf are given with different value of $Q$-parameter.
+
+![enter image description here](http://snag.gy/lrTRE.jpg)

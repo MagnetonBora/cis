@@ -37,6 +37,7 @@ class User(object):
         self._contacts = [] if contacts is None else contacts
         self._user_info = user_info
         self._replies = []
+        self._demand_replies = 0
         self._parent = None
 
     def _generate_uid(self, length):
@@ -143,7 +144,10 @@ class ContactsManager(object):
         self._names = read_names('data/names.dat')
 
     def _generate_age(self, avg_age, age_dev):
-        return int(random.gauss(avg_age, age_dev))
+        age = 0.0
+        while age == 0.0:
+            age = math.floor(random.gauss(avg_age, age_dev))
+        return age
 
     def _contacts_generator(self, config, count):
         for i in xrange(count):
